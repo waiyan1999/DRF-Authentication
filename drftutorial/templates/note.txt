@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD with DRF & AJAX</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+
+    <h1>Items</h1>
+    
+    <!-- Form to add/edit items -->
+    <form id="item-form">
+        <input type="text" id="name" placeholder="Item Name" required>
+        <textarea id="description" placeholder="Item Description" required></textarea>
+        <button type="submit">Add Item</button>
+    </form>
+
+    <h2>Items List</h2>
+    <ul id="items-list">
+        <!-- List of items will be populated here -->
+    </ul>
+
+    <script>
+        // Function to fetch and display items
+        function fetchItems() {
+            $.ajax({
+                url: '/api/items/',
+                method: 'GET',
+                success: function(response) {
+                    $('#items-list').empty();
+                    response.forEach(function(item) {
+                        $('#items-list').append(`
+                            <li>
+                                ${item.name} - ${item.description}
+                                <button onclick="editItem(${item.id})">Edit</button>
+                                <button onclick="deleteItem(${item.id})">Delete</button>
+                            </li>
+                        `);
+                    });
+                }
+            });
+        }
+
+        // Function to add a new item
+        $('#item-form').submit(function(e) {
+            e.preventDefault();
+            
+            const name = $('#name').val();
+            const description = $('#description').val();
+
+            $.ajax({
+                url: '/api/items/',
+                method: 'POST',
+                data: JSON.stringify({ name: name, description: description }),
+                contentType: 'application/json',
+                success: function(response) {
+                    fetchItems();
+                    $('#name').val('');
+                    $('#description').val('');
+                }
+            });
+        });
+
+        // Function to edit an item
+        function editItem(id) {
+            $.ajax({
+                url: `/api/items/${id}/`,
+                method: 'GET',
+                success: function(item) {
+                    $('#name').val(item.name);
+                    $('#description').val(item.description);
+                    $('#item-form').submit(function(e) {
+                        e.preventDefault();
+                        $.ajax({
+                            url: `/api/items/${id}/`,
+                            method: 'PUT',
+                            data: JSON.stringify({ name: $('#name').val(), description: $('#description').val() }),
+                            contentType: 'application/json',
+                            success: function() {
+                                fetchItems();
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+        // Function to delete an item
+        function deleteItem(id) {
+            $.ajax({
+                url: `/api/items/${id}/`,
+                method: 'DELETE',
+                success: function() {
+                    fetchItems();
+                }
+            });
+        }
+
+        // Initial fetch of items
+        fetchItems();
+    </script>
+
+</body>
+</html>

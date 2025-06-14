@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md">
+            <h1>To Do List</h1>
+
+            <form  class="form-control" id="item-form">
+                <label for="">Title</label>
+                <input type="text" name="" id="title" class="form-control">
+
+                <label for="">Description</label>
+                <textarea name="" id="description"  class="form-control"></textarea> <br>
+
+                <input type="reset" name="" id="" value="Cancel" class="btn btn-warning">
+                {% comment %}
+                <button class="btn btn-primary" type="submit">Submit</button>
+                {% endcomment %}
+
+                <input type="submit" name="" id="" value="Submit" class="btn btn-primary">
+
+              
+            </form>
+            <br>
+
+
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th scope="col">ID</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="items-list">
+                    <tr>
+                        <th scope="row">1</th>
+                        <td>Mark</td>
+                        <td>Otto</td>
+                        <td>
+                        
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+
+        </div>
+        <div class="col-md-2"></div>
+
+    </div>
+</div>
+
+
+<script>
+    // read
+    fetchItem()  
+    function fetchItem() {
+        $.ajax({
+            url: 'http://127.0.0.1:8000/todo/',
+            method: 'GET',
+            success: function (response) {
+                $('#items-list').empty();
+                console.log(response);
+
+                response.forEach(function (item) {
+                    $('#items-list').append(`
+                        <tr>
+                            <th scope="row">${item.id}</th>
+                            <td>${item.title}</td>
+                            <td>${item.description}</td>
+                            <td>
+
+                                <button  onclick="editItem(${item.id})" class="btn btn-info"> Edit </button>
+
+                                <button type="Submit" onclick="deleteItem(${item.id})" class="btn btn-danger">Delete</button>
+                                
+                                
+                            </td>
+                        </tr>
+                    `);
+                });
+            }
+        });
+    };
+
+    // Function to add a new item
+    $('#item-form').submit(function (e) {
+        e.preventDefault();
+
+        const title = $('#title').val();
+        const description = $('#description').val();
+
+        $.ajax({
+            url: 'http://127.0.0.1:8000/todo/',
+            method: 'POST',
+            data: JSON.stringify({ title: title, description: description }),
+            contentType: 'application/json',
+            success: function (response) {
+                fetchItem(); 
+                $('#title').val('');
+                $('#description').val('');
+            }
+        });
+    });
+
+    // Function to delete an item
+    
+    function deleteItem(id) {
+        $.ajax({
+            url: `http://127.0.0.1:8000/detailapi/${id}/`,
+            method: 'DELETE',
+            success: function () {
+            fetchItem(); 
+            }
+        });
+    }
+
+
+     // Function to edit an item
+        function editItem(id) {
+            $.ajax({
+                url: `http://127.0.0.1:8000/detailapi/${id}/`,
+                method: 'GET',
+                success: function(item) {
+                    $('#title').val(item.title);
+                    $('#description').val(item.description);
+                    $('#item-form').submit(function(e) {
+                        e.preventDefault();
+                        $.ajax({
+                            url: `http://127.0.0.1:8000/detailapi/${id}/`,
+                            method: 'PUT',
+                            data: JSON.stringify({ title: $('#title').val(), description: $('#description').val() }),
+                            contentType: 'application/json',
+                            success: function() {
+                                fetchItem();
+                            }
+                        });
+                    });
+                }
+            });
+        }
+
+
+
+
+
+</script>
+
+
+{% endblock content %}
