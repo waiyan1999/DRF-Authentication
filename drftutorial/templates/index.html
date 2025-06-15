@@ -7,7 +7,7 @@
     <div class="row">
         <div class="col-md-2"></div>
         <div class="col-md">
-            <h1>To Do List</h1>
+            <h1>To Do List Hello world</h1>
 
             <form  class="form-control" id="item-form">
                 <label for="">Title</label>
@@ -65,7 +65,7 @@
             url: 'http://127.0.0.1:8000/todo/',
             method: 'GET',
             success: function (response) {
-                $('#items-list').empty();
+                $('#table').empty();
                 console.log(response);
 
                 response.forEach(function (item) {

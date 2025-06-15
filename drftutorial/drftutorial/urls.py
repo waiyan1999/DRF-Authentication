@@ -33,7 +33,7 @@ urlpatterns = [
     path('detail/<int:pk>/',tododetail , name = 'deatil' ),
     path('list/', ToDoAPIView.as_view(), name = 'list'),
     path('detailapi/<int:pk>/', ToDoDetialAPIView.as_view(), name = 'detailapi' ),
-    path('index/',index , name='index'),
+    path('',index , name='index'),
 ]
 
 urlpatterns += [
