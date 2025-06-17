@@ -58,6 +58,11 @@
 
 
 <script>
+
+$(document).ready(function(){
+
+
+    
     // read
     fetchItem()  
     function fetchItem() {
@@ -65,7 +70,7 @@
             url: 'http://127.0.0.1:8000/todo/',
             method: 'GET',
             success: function (response) {
-                $('#table').empty();
+                $('#items-list').empty();
                 console.log(response);
 
                 response.forEach(function (item) {
@@ -149,6 +154,11 @@
 
 
 
+
+
+
+
+});
 
 </script>
 
